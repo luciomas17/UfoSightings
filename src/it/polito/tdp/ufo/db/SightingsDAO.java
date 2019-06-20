@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.polito.tdp.ufo.model.AnnoAvvistamenti;
 import it.polito.tdp.ufo.model.Sighting;
 
 public class SightingsDAO {
@@ -50,6 +51,38 @@ public class SightingsDAO {
 			e.printStackTrace();
 			return null ;
 		}
+	}
+	
+	public List<AnnoAvvistamenti> getAnniEAvvistamenti() {
+		String sql = "SELECT YEAR(datetime) AS anno, COUNT(id) AS avvistamenti " + 
+				"FROM sighting " + 
+				"WHERE country='us' " + 
+				"GROUP BY anno";
+		List<AnnoAvvistamenti> result = new ArrayList<>();
+		
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			
+			ResultSet res = st.executeQuery();
+			
+			while(res.next()) {
+				int anno = res.getInt("anno");
+				int numeroAvvistamenti = res.getInt("avvistamenti");
+				AnnoAvvistamenti temp = new AnnoAvvistamenti(anno, numeroAvvistamenti);
+				
+				result.add(temp);
+			}
+			
+			conn.close();
+			return result;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		
 	}
 
 }
